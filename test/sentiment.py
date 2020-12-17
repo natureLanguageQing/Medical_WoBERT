@@ -1,16 +1,15 @@
 #! -*- coding:utf-8 -*-
 # 情感分析例子
 
-import os, json
-import numpy as np
-from bert4keras.backend import keras, set_gelu
-from bert4keras.tokenizers import Tokenizer
-from bert4keras.models import build_transformer_model
-from bert4keras.optimizers import Adam, extend_with_piecewise_linear_lr
-from bert4keras.snippets import sequence_padding, DataGenerator
-from bert4keras.snippets import open
-from keras.layers import Lambda, Dense
 import jieba
+from bert4more_health.backend import keras
+from bert4more_health.models import build_transformer_model
+from bert4more_health.optimizers import Adam, extend_with_piecewise_linear_lr
+from bert4more_health.snippets import open
+from bert4more_health.snippets import sequence_padding, DataGenerator
+from bert4more_health.tokenizers import Tokenizer
+from keras.layers import Lambda, Dense
+
 jieba.initialize()
 
 num_classes = 2
@@ -18,9 +17,9 @@ maxlen = 512
 batch_size = 32
 
 # bert配置
-config_path = '/root/kg/bert/chinese_wobert_L-12_H-768_A-12/bert_config.json'
-checkpoint_path = '/root/kg/bert/chinese_wobert_L-12_H-768_A-12/bert_model.ckpt'
-dict_path = '/root/kg/bert/chinese_wobert_L-12_H-768_A-12/vocab.txt'
+config_path = '../chinese_wobert_L-12_H-768_A-12/bert_config.json'
+checkpoint_path = '../chinese_wobert_L-12_H-768_A-12/bert_model.ckpt'
+dict_path = '../chinese_wobert_L-12_H-768_A-12/vocab.txt'
 
 
 def load_data(filename):
@@ -33,9 +32,9 @@ def load_data(filename):
 
 
 # 加载数据集
-train_data = load_data('datasets/sentiment/sentiment.train.data')
-valid_data = load_data('datasets/sentiment/sentiment.valid.data')
-test_data = load_data('datasets/sentiment/sentiment.test.data')
+train_data = load_data('../sentiment/sentiment.train.data')
+valid_data = load_data('../sentiment/sentiment.valid.data')
+test_data = load_data('../sentiment/sentiment.test.data')
 
 # 建立分词器
 tokenizer = Tokenizer(

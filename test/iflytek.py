@@ -3,12 +3,12 @@
 
 import os, json
 import numpy as np
-from bert4keras.backend import keras, set_gelu
-from bert4keras.tokenizers import Tokenizer
-from bert4keras.models import build_transformer_model
-from bert4keras.optimizers import Adam, extend_with_piecewise_linear_lr
-from bert4keras.snippets import sequence_padding, DataGenerator
-from bert4keras.snippets import open
+from bert4more_health.backend import keras, set_gelu
+from bert4more_health.tokenizers import Tokenizer
+from bert4more_health.models import build_transformer_model
+from bert4more_health.optimizers import Adam, extend_with_piecewise_linear_lr
+from bert4more_health.snippets import sequence_padding, DataGenerator
+from bert4more_health.snippets import open
 from keras.layers import Lambda, Dense
 from tqdm import tqdm
 import jieba

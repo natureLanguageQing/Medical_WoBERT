@@ -18,14 +18,36 @@ from bert4more_health.optimizers import extend_with_gradient_accumulation
 from bert4more_health.optimizers import extend_with_weight_decay
 from bert4more_health.snippets import DataGenerator
 from bert4more_health.snippets import sequence_padding
-from bert4more_health.snippets import text_segment
 from bert4more_health.tokenizers import Tokenizer, load_vocab
+
+
+def text_segment(text, max_length, seps='\n', strips=None):
+    """将文本按照标点符号划分为若干个短句
+    """
+    text = text.strip().strip(strips)
+    if seps and len(text) > max_length:
+        pieces = text.split(seps[0])
+        text, texts = '', []
+        for i, p in enumerate(pieces):
+            if text and p and len(text) + len(p) > max_length - 1:
+                texts.extend(text_segment(text, max_length, seps[1:], strips))
+                text = ''
+            if i + 1 == len(pieces):
+                text = text + p
+            else:
+                text = text + p + seps[0]
+        if text:
+            texts.extend(text_segment(text, max_length, seps[1:], strips))
+        return texts
+    else:
+        return [text]
+
 
 # 加载用户词典
 jieba.initialize()
-entity_dict = os.listdir("data/entity_dict")
+entity_dict = os.listdir("entity_dict")
 for entity_dict in entity_dict:
-    words = pd.read_csv(os.path.join("data/entity_dict", entity_dict), error_bad_lines=False).values.tolist()
+    words = pd.read_csv(os.path.join("entity_dict", entity_dict), error_bad_lines=False).values.tolist()
     for word in words:
         jieba.add_word(word[0], 999, entity_dict)
 # 基本参数
@@ -36,7 +58,7 @@ num_words = 20000
 
 # bert配置
 config_path = 'chinese_roberta_wwm_ext_L-12_H-768_A-12/bert_config.json'
-checkpoint_path = 'chinese_roberta_wwm_ext_L-12_H-768_A-12/bert_model.ckpt'
+checkpoint_path = 'chinese_roberta_wwm_ext_L-12_H-768_A-12/medical_answer_word_bert_model.ckpt'
 dict_path = 'chinese_roberta_wwm_ext_L-12_H-768_A-12/vocab.txt'
 
 
@@ -65,12 +87,6 @@ def text_process(text):
         yield result
 
 
-# if os.path.exists('medical_chinese_word_bert_L-12_H-768_A-12/tokenizer_config.json'):
-#     token_dict, keep_tokens, compound_tokens = json.load(
-#         open('medical_chinese_word_bert_L-12_H-768_A-12/tokenizer_config.json', encoding="utf-8")
-#     )
-# else:
-# 加载并精简词表
 token_dict, keep_tokens = load_vocab(
     dict_path=dict_path,
     simplified=True,
@@ -187,16 +203,16 @@ class Evaluator(keras.callbacks.Callback):
     """
 
     def on_epoch_end(self, epoch, logs=None):
-        model.save('medical_chinese_word_bert_L-12_H-768_A-12/bert_model.h5')  # 保存模型
+        model.save('medical_chinese_word_bert_L-12_H-768_A-12/medical_answer_word_bert_model.h5')  # 保存模型
 
-        model.save_weights('medical_chinese_word_bert_L-12_H-768_A-12/bert_model.weights')  # 保存模型
+        model.save_weights('medical_chinese_word_bert_L-12_H-768_A-12/medical_answer_word_bert_model.weights')  # 保存模型
 
 
 if __name__ == '__main__':
 
     # 启动训练
     evaluator = Evaluator()
-    f = 'data/questions.csv'
+    f = 'data/answers_clean.csv'
     train_generator = data_generator(corpus(f), batch_size, 10 ** 5)
 
     train_model.fit_generator(
@@ -208,6 +224,6 @@ if __name__ == '__main__':
 
 else:
     # 加载模型 仅仅包含权重
-    model.load_weights('medical_chinese_word_bert_L-12_H-768_A-12/bert_model.weights')
+    model.load_weights('medical_chinese_word_bert_L-12_H-768_A-12/medical_answer_word_bert_model.weights')
     # 加载模型 整个模型
-    model = load_model("medical_chinese_word_bert_L-12_H-768_A-12/bert_model.h5")
+    model = load_model("medical_chinese_word_bert_L-12_H-768_A-12/medical_answer_word_bert_model.h5")

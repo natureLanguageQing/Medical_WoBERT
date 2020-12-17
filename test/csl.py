@@ -8,13 +8,13 @@ from __future__ import print_function
 import json
 import numpy as np
 from tqdm import tqdm
-from bert4keras.backend import keras, K
-from bert4keras.layers import Loss
-from bert4keras.models import build_transformer_model
-from bert4keras.tokenizers import Tokenizer, load_vocab
-from bert4keras.optimizers import Adam
-from bert4keras.snippets import sequence_padding, open
-from bert4keras.snippets import DataGenerator, AutoRegressiveDecoder
+from bert4more_health.backend import keras, K
+from bert4more_health.layers import Loss
+from bert4more_health.models import build_transformer_model
+from bert4more_health.tokenizers import Tokenizer, load_vocab
+from bert4more_health.optimizers import Adam
+from bert4more_health.snippets import sequence_padding, open
+from bert4more_health.snippets import DataGenerator, AutoRegressiveDecoder
 from keras.models import Model
 from rouge import Rouge  # pip install rouge
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
